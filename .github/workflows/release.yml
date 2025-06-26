@@ -26,7 +26,11 @@ jobs:
         pip install build cibuildwheel
 
     - name: Create source dist
-      run: python -m build -s
+      run: | 
+        export CFLAGS="-fno-strict-overflow -Wsign-compare -DNDEBUG -O3 -Wall -fPIC"
+        export CPPFLAGS="-DNDEBUG"
+        export LDFLAGS="-Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro"
+        python -m build -s --no-isolation
 
     - name: Publish source dist to github
       uses: actions/upload-artifact@v4
@@ -71,6 +75,9 @@ jobs:
 
     env:
       PIP_DISABLE_PIP_VERSION_CHECK: 1
+      CFLAGS: "-fno-strict-overflow -Wsign-compare -DNDEBUG -O3 -Wall -fPIC"
+      CPPFLAGS: "-DNDEBUG"
+      LDFLAGS: "-Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro"
 
     steps:
       - uses: actions/checkout@v4
